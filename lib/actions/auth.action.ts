@@ -1,4 +1,7 @@
+
 'use server';
+import { getFeedbackByInterviewId } from '@/lib/actions/general.action';
+
 import { auth, db } from "@/firebase/admin";
 import { cookies } from "next/headers";
 
@@ -24,7 +27,8 @@ export async function signUp(params: SignUpParams) {
             success: true,
             message: 'Account created successfully. Please sign in. '
         }
-    } catch(e:any) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch(e:any) {  
         console.error('Error creating a user', e)
 
         if(e.code === 'auth/email-already-exists'){
@@ -111,3 +115,5 @@ export async function signIn(params: SignInParams) {
 
     return !!user; 
  }
+
+ 
