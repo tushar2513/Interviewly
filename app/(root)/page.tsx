@@ -1,29 +1,57 @@
-import React from 'react'
-import {Button} from '@/components/ui/button'
-import Link from 'next/link';
-import Image from 'next/image';
-import InterviewCard from '@/components/InterviewCard'
+import Link from "next/link";
+import Image from "next/image";
 
-const page = () => {
+import { Button } from "@/components/ui/button";
+import InterviewCard from "@/components/InterviewCard";
+
+import { getCurrentUser } from "@/lib/actions/auth.action";
+import {
+  getInterviewByUserId,
+  getLatestInterviews,
+} from "@/lib/actions/general.action";
+
+async function Home() {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return <p>Please log in to see your interviews.</p>;
+  }
+
+  const [userInterviews, allInterview] = await Promise.all([
+    getInterviewByUserId(user.id),
+    getLatestInterviews({ userId: user.id }),
+  ]);
+
+  const hasPastInterviews = userInterviews?.length ? userInterviews.length > 0 : false;
+  const hasUpcomingInterviews = allInterview?.length ? allInterview.length > 0 : false;
   return (
     <>
       <section className="card-cta">
         <div className="flex flex-col gap-6 max-w-lg">
-          <h2>Get Interview ready with AI-powered Practice & Feedback</h2>
-          <p className="text-lg">Practice on real interview questions & get feedback </p>
-        
-        <Button asChild className="btn-primary max-sm:w-full">
-            <Link href="/interview"> Start an Interview </Link>
-        </Button>
+          <h2>Get Interview-Ready with AI-Powered Practice & Feedback</h2>
+          <p className="text-lg">
+            Practice real interview questions & get instant feedback
+          </p>
+
+          <Button asChild className="btn-primary max-sm:w-full">
+            <Link href="/interview">Start an Interview</Link>
+          </Button>
         </div>
 
-        <Image src="/robot.png" alt="robo-dude" width={400} height={400} className="max-sm:hidden"/>
+        <Image
+          src="/robot.png"
+          alt="robo-dude"
+          width={400}
+          height={400}
+          className="max-sm:hidden"
+        />
       </section>
 
       <section className="flex flex-col gap-6 mt-8">
         <h2>Your Interviews</h2>
-        <div className='interviews-section'>
-        {hasPastInterviews ? (
+
+        <div className="interviews-section">
+          {hasPastInterviews ? (
             userInterviews?.map((interview) => (
               <InterviewCard
                 key={interview.id}
@@ -42,9 +70,10 @@ const page = () => {
       </section>
 
       <section className="flex flex-col gap-6 mt-8">
-        <h2>Take an interview</h2>
-        <div className='interviews-section'>
-        {hasUpcomingInterviews ? (
+        <h2>Take Interviews</h2>
+
+        <div className="interviews-section">
+          {hasUpcomingInterviews ? (
             allInterview?.map((interview) => (
               <InterviewCard
                 key={interview.id}
@@ -60,9 +89,9 @@ const page = () => {
             <p>There are no interviews available</p>
           )}
         </div>
-        </section>
+      </section>
     </>
-  )
+  );
 }
 
-export default page
+export default Home;
